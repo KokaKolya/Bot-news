@@ -1,0 +1,48 @@
+import requests
+from bs4 import BeautifulSoup
+
+def scrape_news():
+    # Make a request to the website to fetch the HTML content
+    response = requests.get("https://www.example.com/news")  # Replace with the actual website URL
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Find the news articles using appropriate HTML tags and classes
+        articles = soup.find_all('article', class_='news-article')
+
+        news_list = []
+        for article in articles:
+            # Extract the relevant information from the article
+            title = article.find('h2', class_='article-title').text.strip()
+            summary = article.find('p', class_='article-summary').text.strip()
+            link = article.find('a', class_='article-link')['href']
+
+            # Create a dictionary with the extracted information
+            news_item = {
+                'title': title,
+                'summary': summary,
+                'link': link
+            }
+            news_list.append(news_item)
+
+        return news_list
+    else:
+        return None
+
+# Example usage
+def send_news():
+    news = scrape_news()
+    if news:
+        for article in news:
+            # Format the news article
+            message = f"Title: {article['title']}\nSummary: {article['summary']}\nLink: {article['link']}"
+            # Replace this part with your actual code to send the message
+            print(message)
+    else:
+        response_message = "Oops! Failed to retrieve news."
+
+        # Replace this part with your actual code to send the message
+        print(response_message)
+
+# Test the function
+send_news()
