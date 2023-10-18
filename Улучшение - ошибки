@@ -1,0 +1,61 @@
+# В этой версии бот может обрабатывать ошибки 
+import requests
+from bs4 import BeautifulSoup
+
+# Конфигурационные настройки
+url = "https://www.example.com/news"  # Замените на фактический URL вашего новостного источника
+article_class = "news-article"
+title_class = "article-title"
+summary_class = "article-summary"
+link_class = "article-link"
+
+def scrape_news():
+    try:
+        # Make a request to the website to fetch the HTML content
+        response = requests.get(url)
+        response.raise_for_status()  # Генерирует исключение, если запрос завершается с ошибкой
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Find the news articles using appropriate HTML tags and classes
+        articles = soup.find_all('article', class_=article_class)
+
+        news_list = []
+        for article in articles:
+            # Extract the relevant information from the article
+            title = article.find('h2', class_=title_class).text.strip()
+            summary = article.find('p', class_=summary_class).text.strip()
+            link = article.find('a', class_=link_class)['href']
+
+            # Create a dictionary with the extracted information
+            news_item = {
+                'title': title,
+                'summary': summary,
+                'link': link
+            }
+            news_list.append(news_item)
+
+        return news_list
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred while making the request: {e}")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
+# Example usage
+def send_news():
+    news = scrape_news()
+    if news:
+        for article in news:
+            # Format the news article
+            message = f"Title: {article['title']}\nSummary: {article['summary']}\nLink: {article['link']}"
+            # Replace this part with your actual code to send the message
+            print(message)
+    else:
+        response_message = "Oops! Failed to retrieve news."
+
+        # Replace this part with your actual code to send the message
+        print(response_message)
+
+# Test the function
+send_news()
